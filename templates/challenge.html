@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}challenge · challenge portal{% endblock %}
+
+{% block content %}
+{% if not challenge %}
+  <p class="empty">no challenges yet</p>
+{% else %}
+  {% if challenges|length > 1 %}
+    <div class="chips">
+      {% for c in challenges %}
+        <a class="chip{% if c.id == challenge.id %} on{% endif %}" href="{{ url_for('challenge', slug=c.slug) }}">{{ c.title|lower }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <article class="prose">{{ body }}</article>
+  <div class="actions">
+    <a class="button primary" href="{{ url_for('submit') }}">submit work</a>
+    <a class="button" href="{{ url_for('gallery', challenge=challenge.slug) }}">see submissions</a>
+  </div>
+{% endif %}
+{% endblock %}

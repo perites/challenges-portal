@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% from "_macros.html" import star_button with context %}
+
+{% block title %}{{ page.name }} · challenge portal{% endblock %}
+
+{% block content %}
+<section class="head">
+  <div>
+    <p class="muted small">
+      <a href="{{ url_for('gallery', challenge=page.challenge_slug) }}">{{ page.challenge_title|lower }}</a>
+    </p>
+    <h1>
+      {{ page.name }}
+      {% if page.is_draft %}<span class="badge">draft</span>{% endif %}
+      {% if page.is_deleted %}<span class="badge danger">deleted</span>{% endif %}
+    </h1>
+    <p class="muted small">
+      by <a href="{{ url_for('gallery', challenge=page.challenge_slug, author=page.author) }}">{{ page.author }}</a>
+      · added {{ page.created_at[:10] }}
+      {% if page.updated_at[:10] != page.created_at[:10] %} · updated {{ page.updated_at[:10] }}{% endif %}
+    </p>
+  </div>
+  {{ star_button(page, starred, stargazers|length) }}
+</section>
+
+{% if page.description %}
+  <p class="description">{{ page.description }}</p>
+{% endif %}
+
+<div class="actions">
+  <a class="button primary" href="{{ view_url }}" target="_blank" rel="noopener">open in new window</a>
+  {% if page.git_url %}<a class="button" href="{{ page.git_url }}" target="_blank" rel="noopener">git</a>{% endif %}
+  {% if page.kind == 'file' %}<a class="button" href="{{ url_for('page_source', name=page.name) }}">source</a>{% endif %}
+  {% if can_edit(page) %}
+    <a class="button" href="{{ url_for('edit_page', name=page.name) }}">edit</a>
+    {% if page.is_draft %}
+      <form method="post" action="{{ url_for('publish_page', name=page.name) }}"><button class="button">publish</button></form>
+    {% endif %}
+    {% if not page.is_deleted %}
+      <form method="post" action="{{ url_for('delete_page', name=page.name) }}" data-confirm="delete {{ page.name }}? it will be hidden from everyone">
+        <button class="button danger">delete</button>
+      </form>
+    {% endif %}
+  {% endif %}
+  {% if page.is_deleted and is_admin() %}
+    <form method="post" action="{{ url_for('restore_page', name=page.name) }}"><button class="button">restore</button></form>
+  {% endif %}
+</div>
+
+<div class="preview">
+  <iframe id="preview" src="{{ view_url }}" title="{{ page.name }}"
+          allow="geolocation; autoplay; clipboard-write; fullscreen" allowfullscreen></iframe>
+  <button class="button small fullscreen" data-fullscreen="preview">fullscreen</button>
+</div>
+{% if page.kind == 'link' %}
+  <p class="muted small">preview empty? some sites block embedding, use open in new window</p>
+{% endif %}
+
+<section class="stargazers">
+  <h2>starred by</h2>
+  {% if stargazers %}
+    <p>
+      {% for s in stargazers %}
+        <a href="{{ url_for('gallery', challenge=page.challenge_slug, author=s.name) }}">{{ s.name }}</a>{{ ',' if not loop.last }}
+      {% endfor %}
+    </p>
+  {% else %}
+    <p class="muted">no stars yet</p>
+  {% endif %}
+</section>
+{% endblock %}

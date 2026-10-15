@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}{{ code }} · challenge portal{% endblock %}
+
+{% block content %}
+<section class="error">
+  <h1>{{ code }}</h1>
+  <p class="muted">{{ message }}</p>
+  <a class="button" href="{{ url_for('gallery') }}">back to gallery</a>
+</section>
+{% endblock %}

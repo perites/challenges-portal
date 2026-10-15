@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "_macros.html" import star_button, thumbnail with context %}
+
+{% block content %}
+<section class="head">
+  <div>
+    <h1>{{ challenge.title|lower if challenge else 'gallery' }}</h1>
+    <p class="muted">
+      {{ pages|length }} page{{ '' if pages|length == 1 else 's' }}
+      {% if challenge %} · <a href="{{ url_for('challenge', slug=challenge.slug) }}">read the challenge</a>{% endif %}
+    </p>
+  </div>
+  <a class="button primary" href="{{ url_for('submit') }}">submit work</a>
+</section>
+
+{% if not challenge %}
+  <p class="empty">no challenges yet</p>
+{% else %}
+  <div class="toolbar">
+    {% if challenges|length > 1 %}
+      <div class="chips">
+        {% for c in challenges %}
+          <a class="chip{% if c.id == challenge.id %} on{% endif %}"
+             href="{{ url_for('gallery', challenge=c.slug, sort=sort) }}">{{ c.title|lower }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="chips">
+      {% for key, label in [('new', 'newest'), ('fewest', 'fewest stars'), ('most', 'most stars')] %}
+        <a class="chip{% if sort == key %} on{% endif %}"
+           href="{{ url_for('gallery', challenge=challenge.slug, sort=key, author=author or None) }}">{{ label }}</a>
+      {% endfor %}
+      {% if author %}
+        <a class="chip on" href="{{ url_for('gallery', challenge=challenge.slug, sort=sort) }}">by {{ author }} &times;</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if pages %}
+    <div class="grid">
+      {% for p in pages %}
+        <article class="card">
+          <a class="thumb" href="{{ url_for('page_detail', name=p.name) }}">{{ thumbnail(p) }}</a>
+          <div class="card-body">
+            <div class="card-text">
+              <a class="title" href="{{ url_for('page_detail', name=p.name) }}">{{ p.name }}</a>
+              <a class="muted small" href="{{ url_for('gallery', challenge=challenge.slug, author=p.author) }}">by {{ p.author }}</a>
+            </div>
+            {{ star_button(p, p.starred, p.stars) }}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty">no pages yet. be the first one</p>
+  {% endif %}
+{% endif %}
+{% endblock %}

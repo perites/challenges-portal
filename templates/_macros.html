@@ -1,0 +1,20 @@
+{% macro star_button(page, starred, count) %}
+<form method="post" action="{{ url_for('star', name=page.name) }}" class="star-form">
+  <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
+  <button class="star{% if starred %} on{% endif %}" aria-pressed="{{ 'true' if starred else 'false' }}"
+    {% if g.user and g.user.id == page.user_id %}disabled title="your page"{% else %}title="star"{% endif %}>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/>
+    </svg>
+    <span class="count">{{ count }}</span>
+  </button>
+</form>
+{% endmacro %}
+
+{% macro thumbnail(page) %}
+  {% if page.thumb_ext %}
+    <img src="{{ url_for('thumb', filename=page.name ~ '.' ~ page.thumb_ext) }}" alt="" loading="lazy">
+  {% else %}
+    <span class="placeholder">{{ page.name }}</span>
+  {% endif %}
+{% endmacro %}

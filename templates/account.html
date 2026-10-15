@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}account · challenge portal{% endblock %}
+
+{% block content %}
+<section class="head">
+  <div>
+    <h1>{{ g.user.name }}</h1>
+    <p class="muted">{{ 'admin' if is_admin() else 'member' }} since {{ g.user.created_at[:10] }}</p>
+  </div>
+  <a class="button primary" href="{{ url_for('submit') }}">submit work</a>
+</section>
+
+<section class="block">
+  <h2>your pages</h2>
+  {% if pages %}
+    <ul class="rows">
+      {% for p in pages %}
+        <li>
+          <a href="{{ url_for('page_detail', name=p.name) }}">{{ p.name }}</a>
+          {% if p.is_draft %}<span class="badge">draft</span>{% endif %}
+          <span class="muted small">{{ p.stars }} star{{ '' if p.stars == 1 else 's' }}</span>
+          <a class="button small" href="{{ url_for('edit_page', name=p.name) }}">edit</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">no pages yet</p>
+  {% endif %}
+</section>
+
+<section class="block">
+  <h2>change name</h2>
+  <form class="form inline-form" method="post" action="{{ url_for('change_name') }}">
+    <label>
+      <input name="name" value="{{ g.user.name }}" required minlength="3" maxlength="20" pattern="[a-z0-9_\-]{3,20}">
+      <small>used to log in and shown as author on all your pages</small>
+    </label>
+    <button class="button">save</button>
+  </form>
+</section>
+
+{% if is_admin() %}
+<section class="block">
+  <h2>deleted pages</h2>
+  {% if deleted %}
+    <ul class="rows">
+      {% for p in deleted %}
+        <li>
+          <a href="{{ url_for('page_detail', name=p.name) }}">{{ p.name }}</a>
+          <span class="muted small">by {{ p.author }}</span>
+          <form method="post" action="{{ url_for('restore_page', name=p.name) }}"><button class="button small">restore</button></form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">nothing deleted</p>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

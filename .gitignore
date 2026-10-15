@@ -1,0 +1,5 @@
+data/
+challenges/
+.venv/
+__pycache__/
+*.pyc

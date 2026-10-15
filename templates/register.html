@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}register · challenge portal{% endblock %}
+
+{% block content %}
+<form class="form narrow" method="post" action="{{ url_for('register', next=request.args.get('next')) }}">
+  <h1>register</h1>
+  <label>
+    <span>name</span>
+    <input name="name" value="{{ name }}" required minlength="3" maxlength="20" pattern="[a-z0-9_\-]{3,20}"
+           autocomplete="username" autofocus>
+    <small>3 to 20 chars: a-z, 0-9, _ and -. used to log in and shown as author</small>
+  </label>
+  <label>
+    <span>password</span>
+    <input type="password" name="password" required minlength="6" autocomplete="new-password">
+    <small>at least 6 chars. there is no password change, so remember it</small>
+  </label>
+  <label>
+    <span>repeat password</span>
+    <input type="password" name="confirm" required minlength="6" autocomplete="new-password">
+  </label>
+  <button class="button primary">register</button>
+  <p class="muted small">have an account? <a href="{{ url_for('login', next=request.args.get('next')) }}">log in</a></p>
+</form>
+{% endblock %}

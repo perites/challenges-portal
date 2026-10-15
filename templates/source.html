@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.name }} source · challenge portal{% endblock %}
+
+{% block head %}<style>{{ css }}</style>{% endblock %}
+
+{% block content %}
+<section class="head">
+  <div>
+    <h1>{{ page.name }} <span class="muted">source</span></h1>
+    <p class="muted small">by {{ page.author }} · <a href="{{ url_for('page_detail', name=page.name) }}">back to page</a></p>
+  </div>
+  <a class="button" href="{{ url_for('view_page', name=page.name) }}" target="_blank" rel="noopener">open page</a>
+</section>
+<div class="source">{{ code }}</div>
+{% endblock %}

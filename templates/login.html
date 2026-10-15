@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}log in · challenge portal{% endblock %}
+
+{% block content %}
+<form class="form narrow" method="post" action="{{ url_for('login', next=request.args.get('next')) }}">
+  <h1>log in</h1>
+  <label>
+    <span>name</span>
+    <input name="name" value="{{ name }}" required autocomplete="username" autofocus>
+  </label>
+  <label>
+    <span>password</span>
+    <input type="password" name="password" required autocomplete="current-password">
+  </label>
+  <button class="button primary">log in</button>
+  <p class="muted small">no account? <a href="{{ url_for('register', next=request.args.get('next')) }}">register</a></p>
+</form>
+{% endblock %}

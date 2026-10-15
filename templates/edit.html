@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'edit ' ~ page.name if page else 'submit work' }} · challenge portal{% endblock %}
+
+{% block content %}
+<section class="head">
+  <div>
+    <h1>{{ 'edit ' ~ page.name if page else 'submit work' }}</h1>
+    {% if not page %}<p class="muted">upload one html file or give a link to your page</p>{% endif %}
+  </div>
+</section>
+
+{% if not challenges %}
+  <p class="empty">no challenges yet, nothing to submit to</p>
+{% else %}
+<form class="form" method="post" enctype="multipart/form-data">
+  <label>
+    <span>name</span>
+    {% if page %}
+      <input value="{{ page.name }}" disabled>
+      <small>name is the page url and can't be changed</small>
+    {% else %}
+      <input name="name" value="{{ values.get('name', '') }}" required minlength="3" maxlength="40"
+             pattern="[a-z0-9\-]{3,40}" placeholder="fluffy-cats" autocomplete="off">
+      <small>3 to 40 chars: a-z, 0-9 and -. it becomes the page url and can't be changed later</small>
+    {% endif %}
+  </label>
+
+  <label>
+    <span>challenge</span>
+    <select name="challenge_id">
+      {% for c in challenges %}
+        <option value="{{ c.id }}" {% if values.get('challenge_id') == c.id|string %}selected{% endif %}>{{ c.title|lower }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label>
+    <span>description</span>
+    <textarea name="description" rows="4" maxlength="1000">{{ values.get('description', '') }}</textarea>
+    <small>optional, up to 1000 chars</small>
+  </label>
+
+  <fieldset>
+    <legend>page source: file or link</legend>
+    <label>
+      <span>html file</span>
+      <input type="file" name="html_file" accept=".html,.htm">
+      {% if page and page.kind == 'file' %}
+        <small>leave empty to keep the current file. a new file overwrites it</small>
+      {% elif page %}
+        <small>upload a file to replace the current link</small>
+      {% else %}
+        <small>.html or .htm, up to 5 mb</small>
+      {% endif %}
+    </label>
+    <label>
+      <span>or link</span>
+      <input type="url" name="link_url" value="{{ values.get('link_url', '') }}" placeholder="https://you.github.io/cats">
+      {% if page and page.kind == 'file' %}
+        <small>fill only to replace the uploaded file with a link</small>
+      {% else %}
+        <small>https only. leave empty if you upload a file</small>
+      {% endif %}
+    </label>
+  </fieldset>
+
+  <label>
+    <span>git link</span>
+    <input type="url" name="git_url" value="{{ values.get('git_url', '') }}" placeholder="https://github.com/you/cats">
+    <small>optional, https only</small>
+  </label>
+
+  <label>
+    <span>thumbnail</span>
+    {% if page and page.thumb_ext %}
+      <img class="current-thumb" src="{{ url_for('thumb', filename=page.name ~ '.' ~ page.thumb_ext) }}" alt="current thumbnail">
+    {% endif %}
+    <input type="file" name="thumb_file" accept=".png,.jpg,.jpeg,.webp">
+    {% if page and page.thumb_ext %}
+      <small>leave empty to keep the current thumbnail. png, jpg or webp, up to 2 mb</small>
+    {% else %}
+      <small>optional. png, jpg or webp, up to 2 mb. shown in the gallery</small>
+    {% endif %}
+  </label>
+
+  <label class="check">
+    <input type="checkbox" name="is_draft" value="1" {% if values.get('is_draft') %}checked{% endif %}>
+    <span>draft: hidden from the gallery, still reachable by its link</span>
+  </label>
+
+  <div class="actions">
+    <button class="button primary">{{ 'save changes' if page else 'submit' }}</button>
+    <a class="button" href="{{ url_for('page_detail', name=page.name) if page else url_for('gallery') }}">cancel</a>
+  </div>
+</form>
+{% endif %}
+{% endblock %}
